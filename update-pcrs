@@ -1,0 +1,120 @@
+#!/bin/bash
+
+# --- Default Configuration ---
+SCRIPT_VERSION="1.0.0"
+# Default, high-security PCR configuration.
+DEFAULT_PCRS="0+4+7+11"
+# --- End Configuration ---
+
+# Define a function for the usage/help message
+print_usage() {
+  echo ""
+  echo "Usage: /usr/local/bin/update-pcrs [options] /dev/your_luks_device [optional_pcrs_list]"
+  echo ""
+  echo "Options:"
+  echo "  -h        Display this help message and exit."
+  echo "  -v        Display version information and exit."
+  echo ""
+  echo "Example 1: Default PCRs [$DEFAULT_PCRS]"
+  echo ""
+  echo "    update-pcrs /dev/sda3"
+  echo ""
+  echo "Example 2: Custom PCRs"
+  echo ""
+  echo "    update-pcrs /dev/sda3 0+4+7"
+  exit 0
+}
+
+# Check if the script is run with root privileges (or sudo)
+if [ "$EUID" -ne 0 ]; then
+  echo ""
+  echo "🚨 Please run this script with sudo!"
+  exit 1
+fi
+
+# --- Option Parsing with getops ---
+# Initialize 'opt' to prevent SpellCheck warning SC2154
+opt=""
+
+while getopts "hv" opt; do
+  case $opt in
+  h)
+    # Help option (-h)
+    print_usage
+    ;;
+  v)
+    # Version option (-v)
+    echo ""
+    echo "Update PCRs Script v$SCRIPT_VERSION"
+    exit 0
+    ;;
+  \?)
+    # Unknown option is handled by getopts printing an error to stderr
+    print_usage # Then print the usage/help message
+    ;;
+  esac
+done
+
+# Shift off the options so that $1 now points to the first non-option argument (the LUKS device)
+shift $((OPTIND - 1))
+
+# Check for the required LUKS block device path argument
+if [ -z "$1" ]; then
+  echo ""
+  echo "🚨 Missing required LUKS block device path!"
+  print_usage # Call the centralized usage function
+fi
+
+LUKS_DEVICE="$1"
+
+# Determine the PCR list: use the second argument if provided, otherwise use the default.
+PCRS="${2:-$DEFAULT_PCRS}"
+
+echo ""
+echo "🔐 Starting LUKS2 TPM2 PCR management for: **$LUKS_DEVICE**"
+echo "   Using PCR set: **$PCRS**"
+echo "----------------------------------------------------------------------------------"
+
+# Wipe the existing TPM2 enrollment slot
+echo ""
+echo "🔄 1/3: Wiping existing TPM2 enrollment slot on $LUKS_DEVICE..."
+echo ""
+if systemd-cryptenroll --wipe-slot=tpm2 "$LUKS_DEVICE"; then
+  echo ""
+  echo "    ✅ Slot successfully wiped."
+else
+  echo ""
+  echo "    ❌ Error wiping TPM2 slot. Aborting."
+  exit 1
+fi
+
+# Re-enroll the new PCRs
+echo ""
+echo "🔄 2/3: Re-enrolling with PCRs $PCRS on $LUKS_DEVICE..."
+echo "    **NOTE: You will be prompted to enter your LUKS passphrase.**"
+echo ""
+if systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs="$PCRS" "$LUKS_DEVICE"; then
+  echo ""
+  echo "    ✅ PCRs successfully re-enrolled."
+else
+  echo ""
+  echo "    ❌ Error during TPM2 re-enrollment. Aborting."
+  exit 1
+fi
+
+# Run dracut to regenerate the initramfs
+echo ""
+echo "🔄 3/3: Regenerating the initramfs..."
+echo ""
+if dracut -f; then
+  echo ""
+  echo "    ✅ initramfs successfully regenerated."
+else
+  echo ""
+  echo "    ❌ Error running dracut. Check your system logs."
+  exit 1
+fi
+
+echo ""
+echo "✨ **Update process completed successfully!**"
+echo "----------------------------------------------------------------------------------"
