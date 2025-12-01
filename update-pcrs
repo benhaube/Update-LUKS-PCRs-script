@@ -29,6 +29,7 @@ print_usage() {
 if [ "$EUID" -ne 0 ]; then
   echo ""
   echo "🚨 Please run this script with sudo!"
+  print_usage # Call the centralized usage function
   exit 1
 fi
 
