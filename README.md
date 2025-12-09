@@ -1,10 +1,17 @@
 # Update-LUKS-PCRs-script
 This Bash script automates the process of clearing TPM PCRs from the LUKS header, registering new PCRs, and regenerating the initramfs. As a Fedora user it became a pain to manually complete this process every time the kernel gets updated, so I wrote this script to make the process easier. This is a full-featured script with a help message, error logging, and checks for proper command syntax. Unfortunately, for the moment, this script will only work on distributions that use `dracut` for regenerating the initramfs. If people find this script useful and I have enough time, I might add the ability to use `mkinitramfs` to regenerate the initramfs, but I have not gotten that far yet. 
 
-## Dependencies
-In oder to run this script you need to have the following:
+## Prerequisite
+
+**In oder to run this script your system needs to meet the following requirements:**
+
 + A volume encrypted with **LUKS2** format. LUKS(1) volumes will not work.
-    + You can check this with the command: `cryptsetup luksDump /dev/your_device`
+    + You can check this with the command:
+
+        ```
+        cryptsetup luksDump /dev/your_device
+        ```
+
 + An active **TPM2** chip.
 + Packages:
     + `systemd-cryptenroll`
@@ -15,6 +22,7 @@ In oder to run this script you need to have the following:
     + Instructions for this process can be found [here](https://github.com/benhaube/Linux-Configuration-Tutorials/blob/main/Security/Unlock_LUKS_TPM2.md).
 
 ## Install
+
 1. Clone the Github repo:
 
     ```
