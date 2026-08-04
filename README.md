@@ -55,4 +55,4 @@ This Bash script automates the process of clearing TPM PCRs from the LUKS header
     
 ## Screenshots
 
-![Update PCRs Script output](/screenshots/update-pcrs.png){ width=500 }
+![Update PCRs Script output](/screenshots/update-pcrs.png)
