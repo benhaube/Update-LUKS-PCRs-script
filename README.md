@@ -1,4 +1,12 @@
-# Update-LUKS-PCRs-script
+<p align="center">
+    <img src="screenshots/update-pcrs.png" alt="Screenshot of the update-pcrs script output." />
+</p>
+<p align="center">
+    <h1>
+    Update-LUKS-PCRs-script
+    </h1>
+</p>
+
 This Bash script automates the process of clearing TPM PCRs from the LUKS header, registering new PCRs, and regenerating the initramfs. As a Fedora user it became a pain to manually complete this process every time the kernel gets updated, so I wrote this script to make the process easier. This is a full-featured script with a help message, error logging, and checks for proper command syntax. Unfortunately, for the moment, this script will only work on distributions that use `dracut` for regenerating the initramfs. If people find this script useful and I have enough time, I might add the ability to use `mkinitramfs` to regenerate the initramfs, but I have not gotten that far yet. 
 
 ## Prerequisite
@@ -52,7 +60,3 @@ This Bash script automates the process of clearing TPM PCRs from the LUKS header
     ```
     sudo update-pcrs [options] /dev/your_luks_device [optional_pcrs_list]
     ```
-    
-## Screenshots
-
-![Update PCRs Script output](/screenshots/update-pcrs.png)
