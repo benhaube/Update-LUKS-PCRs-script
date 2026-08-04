@@ -1,8 +1,8 @@
 <p align="center">
     <img src="screenshots/update-pcrs.png" alt="Screenshot of the update-pcrs script output." />
 </p>
-<p align="center">
-    <h1>
+<p>
+    <h1 align="center">
     Update-LUKS-PCRs-script
     </h1>
 </p>
