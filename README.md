@@ -1,24 +1,27 @@
 <p align="center">
-    <img src="screenshots/update-pcrs.png" alt="Screenshot of the update-pcrs script output." />
+    <img alt="Project logo" src="assets/logo.png">
 </p>
 <p>
     <h1 align="center">
-    Update-LUKS-PCRs-script
+    Update LUKS PCRs Script
     </h1>
 </p>
 
 This Bash script automates the process of clearing TPM PCRs from the LUKS header, registering new PCRs, and regenerating the initramfs. As a Fedora user it became a pain to manually complete this process every time the kernel gets updated, so I wrote this script to make the process easier. This is a full-featured script with a help message, error logging, and checks for proper command syntax. Unfortunately, for the moment, this script will only work on distributions that use `dracut` for regenerating the initramfs. If people find this script useful and I have enough time, I might add the ability to use `mkinitramfs` to regenerate the initramfs, but I have not gotten that far yet. 
 
+<p align="center">
+    <img src="assets/update-pcrs.png" alt="Screenshot of the update-pcrs script output." />
+</p>
+
 ## Prerequisite
 
 **In oder to run this script your system needs to meet the following requirements:**
 
-+ A volume encrypted with **LUKS2** format. LUKS(1) volumes will not work.
-    + You can check this with the command:
++ A volume encrypted with **LUKS2** format. LUKS(1) volumes will not work. You can check this with the following command:
 
-        ```
-        cryptsetup luksDump /dev/your_device
-        ```
+    ``` bash
+    cryptsetup luksDump /dev/your_device
+    ```
 
 + An active **TPM2** chip.
 + Packages:
@@ -33,30 +36,30 @@ This Bash script automates the process of clearing TPM PCRs from the LUKS header
 
 1. Clone the Github repo:
 
-    ```
+    ``` bash
     git clone https://github.com/benhaube/Update-LUKS-PCRs-script.git
     ```
 
 2. Enter the directory:
 
-    ```
+    ``` bash
     cd Update-LUKS-PCRs-script/
     ```
 
 3. Copy the file `update-pcrs` to the `/usr/local/bin/` directory:
 
-    ```
+    ``` bash
     sudo cp update-pcrs /usr/local/bin/
     ```
 
 4. Set the execution permission for the `update-pcrs` script:
 
-    ```
+    ``` bash
     sudo chmod +x /usr/local/bin/update-pcrs
     ```
 
 5. You can now run the script (with `sudo`) from any directory:
 
-    ```
+    ``` bash
     sudo update-pcrs [options] /dev/your_luks_device [optional_pcrs_list]
     ```
